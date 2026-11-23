@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openconvert-md"
+version = "0.1.0"
+description = "OpenConvert 的 Markdown 表格导出器（独立扩展）"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["openconvert>=0.1,<0.2"]
+
+[project.entry-points."openconvert.exporters"]
+markdown = "openconvert_md.exporter:MarkdownExporter"
+
+[tool.setuptools.packages.find]
+where = ["src"]
