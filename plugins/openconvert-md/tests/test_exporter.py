@@ -70,6 +70,26 @@ def test_反引号原样保留():
     assert out.splitlines()[2] == "| `code` |"
 
 
+def test_单独的_cr_也转成_html_换行():
+    out = render(["h"], [["第一行\r第二行"]])
+    assert out.splitlines()[2] == "| 第一行<br>第二行 |"
+
+
+def test_尖括号原样保留():
+    out = render(["h"], [["<b>粗</b>"]])
+    assert out.splitlines()[2] == "| <b>粗</b> |"
+
+
+def test_首尾空格原样保留():
+    out = render(["h"], [["  两端有空格  "]])
+    assert out.splitlines()[2] == "|   两端有空格   |"
+
+
+def test_数字与编号不被改写():
+    out = render(["学号"], [["001"], ["2024001"]])
+    assert out.splitlines()[2:] == ["| 001 |", "| 2024001 |"]
+
+
 def test_无列时抛导出错误():
     with pytest.raises(ExporterError):
         render([], [])
