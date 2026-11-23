@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openconvert"
+version = "0.1.0"
+description = "把 CSV 表格转换成需要的格式：核心不认识任何具体格式，扩展只依赖公开契约"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5", "build>=1.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "TRY"]
+# TRY003：面向用户的中文提示直接写在抛出处，不塞进异常类。
+# TRY004：契约规定 Table 与 register() 的类型校验一律抛 ValueError（见 docs/CONTRACT.md）。
+ignore = ["TRY003", "TRY004"]
