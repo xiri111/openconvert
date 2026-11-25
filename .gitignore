@@ -25,3 +25,6 @@ Thumbs.db
 
 # 鏈湴閰嶇疆锛堝惈缁濆璺緞鏃朵笉搴旀彁浜わ級
 *.local.properties
+
+# 文档构建中间产物
+tools/_*.json
