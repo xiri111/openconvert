@@ -7,10 +7,12 @@ import io
 
 import pytest
 
-pytest.importorskip("openconvert.exporter_api", reason="契约尚未就绪，跳过")
+try:
+    from openconvert_md.exporter import MarkdownExporter
 
-from openconvert.exporter_api import PLUGIN_API_VERSION, ExporterError, Table  # noqa: E402
-from openconvert_md.exporter import MarkdownExporter  # noqa: E402
+    from openconvert.exporter_api import PLUGIN_API_VERSION, ExporterError, Table
+except ImportError:
+    pytest.skip("契约尚未就绪，跳过", allow_module_level=True)
 
 
 def render(columns, rows):
