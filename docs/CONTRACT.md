@@ -24,7 +24,8 @@ class Exporter(Protocol):
     api_version: int      # 必须等于 PLUGIN_API_VERSION
     format_name: str      # CLI -f 的取值，小写且唯一
     display_name: str     # formats 命令里的显示名
-    suffix: str           # 默认扩展名建议，如 ".md"
+    suffix: str           # 默认扩展名建议，如 ".md"（v1 核心未使用：`-o` 必填，
+                          # 不会按格式自动补后缀；留给将来的默认文件名）
     def export(self, table: Table, out: TextIO) -> None: ...
 ```
 
