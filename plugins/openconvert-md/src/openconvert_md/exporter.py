@@ -3,6 +3,7 @@ r"""Markdown 表格导出器。
 转换规则（与设计文档“Markdown 导出规则”表一致）：
 
 - 竖线 ``|`` → ``\|``：不转义会破坏列结构
+- 反斜杠 ``\`` → ``\\``：必须先于竖线转义，否则 ``x\|y`` 会被解析成“转义符 + 列分隔符”
 - ``\r\n`` / ``\r`` 先归一为 ``\n``，再替换为 ``<br>``：GFM 单元格不支持换行
 - 空字符串 → 空单元格，保留分隔符：不能吞列导致错位
 - 反引号与 ``<`` ``>`` 原样保留：渲染器会解释，属已知限制
@@ -20,7 +21,10 @@ from openconvert.exporter_api import PLUGIN_API_VERSION, ExporterError, Table
 def _cell(value: str) -> str:
     """把单元格内容转成 GFM 表格里安全的文本。"""
     text = value.replace("\r\n", "\n").replace("\r", "\n")
-    return text.replace("|", "\\|").replace("\n", "<br>")
+    # 先转义反斜杠、再转义竖线：顺序反了会把竖线前的转义符本身吃成一个字面反斜杠，
+    # 竖线重新变回列分隔符（见 PR #1 评审意见）。
+    text = text.replace("\\", "\\\\").replace("|", "\\|")
+    return text.replace("\n", "<br>")
 
 
 class MarkdownExporter:

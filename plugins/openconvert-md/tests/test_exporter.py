@@ -44,6 +44,18 @@ def test_竖线被转义():
     assert out.splitlines() == ["| a\\|b |", "| --- |", "| c\\|d |"]
 
 
+def test_反斜杠加竖线不破表():
+    """``x\\|y`` 若只转义竖线，会变成 ``x\\\\|y``——GFM 把 ``\\\\`` 当字面反斜杠，竖线重新当分隔符。"""
+    out = render(["h"], [["x\\|y"]])
+    expected = "| " + "x" + "\\" * 3 + "|" + "y" + " |"
+    assert out.splitlines()[2] == expected
+
+
+def test_单独的反斜杠被转义():
+    out = render(["h"], [["a\\b"]])
+    assert out.splitlines()[2] == "| a" + "\\" * 2 + "b |"
+
+
 def test_换行转成_html_换行():
     out = render(["h"], [["第一行\r\n第二行"]])
     assert out.splitlines()[2] == "| 第一行<br>第二行 |"
