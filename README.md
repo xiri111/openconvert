@@ -3,7 +3,7 @@
 把 CSV 表格转换成需要的格式：一条命令转 JSON，装一个插件就能转 Markdown。核心不认识任何具体格式，扩展只依赖公开契约。
 
 ```text
-openconvert convert -i 学生.csv -f json -o 结果.json
+openconvert convert -i samples/学生.csv -f json -o 结果.json
 已转换：12 条记录，4 列，耗时 0.01 秒，输出到 结果.json（1.3 KB）
 ```
 
@@ -17,7 +17,7 @@ openconvert convert -i 学生.csv -f json -o 结果.json
 需要 Python 3.11 及以上。
 
 ```bash
-git clone <仓库地址>
+git clone https://github.com/xiri111/openconvert.git
 cd openconvert
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1          # macOS / Linux：source .venv/bin/activate
@@ -36,7 +36,7 @@ openconvert formats                   # 列出可用格式
 ### 转换
 
 ```bash
-openconvert convert -i 学生.csv -f json -o 结果.json
+openconvert convert -i samples/学生.csv -f json -o 结果.json
 ```
 
 输出四要素固定：条数、列数、耗时、文件大小。
@@ -54,7 +54,7 @@ openconvert convert -i 学生.csv -f json -o 结果.json
 
 - **默认不覆盖**。目标已存在会拒绝并提示，确认要覆盖时加 `--overwrite`：
   ```bash
-  openconvert convert -i 学生.csv -f json -o 结果.json --overwrite
+  openconvert convert -i samples/学生.csv -f json -o 结果.json --overwrite
   ```
 - **不会写半截文件**。内容先写目标同目录下的临时文件，成功后改名；任何步骤失败都清理临时文件，已存在的目标保持原样。
 - **不许写回源文件**。`-o` 与 `-i` 指向同一文件时直接拒绝，避免把输入覆盖掉。
@@ -194,7 +194,7 @@ python -m build plugins/openconvert-md --outdir plugins/openconvert-md/dist
 | 成员2 | 数据怎么写出去 | Markdown 独立扩展、插件测试与打包 |
 | 成员3 | 用户看到什么、能否交付 | CLI、原子写、CI、发布 |
 
-详见仓库外的《OpenConvert 开发计划书》。
+契约细节见 [docs/CONTRACT.md](docs/CONTRACT.md)，设计取舍见 [docs/DESIGN.docx](docs/DESIGN.docx)；本节不重复。
 
 ## 许可证
 
