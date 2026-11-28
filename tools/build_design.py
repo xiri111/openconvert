@@ -428,8 +428,8 @@ K.h1("测试与质量方案", 7)
 
 K.h2("测试分层与夹具", "7.1")
 K.body("测试分三层，各自回答一个问题：契约成立吗（单元）、整条命令成立吗（集成）、失败时说得清吗（失败路径）。"
-"核心共 71 条：读取与契约 43 条（`tests/test_reader.py` 16 条、`tests/test_table.py` 8 条、"
-"`tests/test_registry.py` 19 条），写盘 8 条（`tests/test_writer.py`），命令行集成 20 条（`tests/test_cli.py`）。"
+"核心共 76 条：读取与契约 48 条（`tests/test_reader.py` 16 条、`tests/test_table.py` 8 条、"
+"`tests/test_registry.py` 24 条），写盘 8 条（`tests/test_writer.py`），命令行集成 20 条（`tests/test_cli.py`）。"
 "插件另有 13 条契约测试（`plugins/openconvert-md/tests/`），未安装插件时整体跳过、不误报失败。")
 K.body("夹具统一放在 `samples/`：`学生.csv`（正常，12 行 4 列）、`边界.csv`（引号内逗号、引号内换行、"
 "空单元格、列数不齐）、`空表.csv`（只有表头）。`tests/conftest.py` 另有一个 `markdown_plugin` 夹具："
