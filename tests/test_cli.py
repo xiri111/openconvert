@@ -256,7 +256,8 @@ def test_formats列出内置格式与来源(capsys):
     code, out, _ = run(["formats"], capsys)
 
     assert code == 0
-    assert "可用格式（1 个）" in out
+    # 格式数量取决于环境里装了几个插件，这里只校验表头与内置 json 行，避免装插件后误报
+    assert "可用格式（" in out
     assert "json" in out
     assert "内置" in out
     assert "v1" in out
