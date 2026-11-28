@@ -203,3 +203,67 @@ def test_插件抛ExporterError原样保留code与message():
     err = ExporterError("EMPTY_TABLE", "没有可导出的列")
     assert err.code == "EMPTY_TABLE"
     assert str(err) == "没有可导出的列"
+
+
+def test_未注册格式调度时带可用列表():
+    with pytest.raises(UnknownFormatError) as info:
+        ExporterRegistry().export("docx", Table(columns=("a",), rows=()), io.StringIO())
+    assert info.value.available == ("json",)
+
+
+def test_插件运行期抛非契约异常归一为一句人话():
+    """插件违反契约（抛 RuntimeError）时由核心兜住，用户只看到一行提示。"""
+
+    class Boom:
+        api_version = PLUGIN_API_VERSION
+        format_name = "boom"
+        display_name = "崩溃格式"
+        suffix = ".boom"
+
+        def export(self, table, out):
+            raise RuntimeError("插件内部炸了")
+
+    registry = ExporterRegistry()
+    registry.register(Boom())
+    with pytest.raises(ExporterError) as info:
+        registry.export("boom", Table(columns=("a",), rows=(("1",),)), io.StringIO())
+    assert info.value.code == "PLUGIN_FAILED"
+    assert info.value.message == "插件 'boom' 执行失败：插件内部炸了"
+    assert isinstance(info.value.__cause__, RuntimeError)
+
+
+def test_插件运行期抛ExporterError原样透传():
+    class Empty:
+        api_version = PLUGIN_API_VERSION
+        format_name = "empty"
+        display_name = "空表格式"
+        suffix = ".empty"
+
+        def export(self, table, out):
+            raise ExporterError("EMPTY_TABLE", "没有可导出的列")
+
+    registry = ExporterRegistry()
+    registry.register(Empty())
+    with pytest.raises(ExporterError) as info:
+        registry.export("empty", Table(columns=("a",), rows=()), io.StringIO())
+    assert info.value.code == "EMPTY_TABLE"
+    assert info.value.message == "没有可导出的列"
+    assert info.value.__cause__ is None
+
+
+def test_中断信号不被吞掉():
+    """只兜 Exception；Ctrl+C 一类 BaseException 必须照常向上抛。"""
+
+    class Interrupting:
+        api_version = PLUGIN_API_VERSION
+        format_name = "intr"
+        display_name = "中断格式"
+        suffix = ".intr"
+
+        def export(self, table, out):
+            raise KeyboardInterrupt
+
+    registry = ExporterRegistry()
+    registry.register(Interrupting())
+    with pytest.raises(KeyboardInterrupt):
+        registry.export("intr", Table(columns=("a",), rows=()), io.StringIO())

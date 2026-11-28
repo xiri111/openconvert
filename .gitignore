@@ -17,6 +17,9 @@ out/
 缁撴灉.md
 *.tmp
 
+# 璁捐鏂囨。鏋勫缓涓棿浜х墿
+tools/_headings.json
+
 # 缂栬緫鍣ㄤ笌绯荤粺
 .idea/
 .vscode/
@@ -25,6 +28,3 @@ Thumbs.db
 
 # 鏈湴閰嶇疆锛堝惈缁濆璺緞鏃朵笉搴旀彁浜わ級
 *.local.properties
-
-# 文档构建中间产物
-tools/_*.json

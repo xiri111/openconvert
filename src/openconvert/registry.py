@@ -8,8 +8,9 @@ import importlib.metadata
 import warnings
 from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import TextIO
 
-from .exporter_api import PLUGIN_API_VERSION, Exporter
+from .exporter_api import PLUGIN_API_VERSION, Exporter, ExporterError, Table
 
 ENTRY_POINT_GROUP = "openconvert.exporters"
 
@@ -83,6 +84,25 @@ class ExporterRegistry:
             return self._exporters[name]
         except KeyError as exc:
             raise UnknownFormatError(name, self.formats) from exc
+
+    def export(self, name: str, table: Table, out: TextIO) -> None:
+        """按格式名调用导出器，并把插件抛出的意外异常归一成一行提示。
+
+        契约要求插件失败只抛 :class:`ExporterError`；插件违反契约（抛
+        ``RuntimeError``、``TypeError`` 等）时，不能让 traceback 直接甩给用户，
+        这里统一包成 ``ExporterError("PLUGIN_FAILED", ...)``，CLI 照常映射退出码 3。
+        插件自己抛的 ``ExporterError`` 原样透传，``code`` 与 ``message`` 不变。
+        """
+        exporter = self.get(name)
+        try:
+            exporter.export(table, out)
+        except ExporterError:
+            raise
+        except Exception as exc:  # 第三方插件抛什么类型不可预期，统一兜住
+            raise ExporterError(
+                "PLUGIN_FAILED",
+                f"插件 '{name}' 执行失败：{exc}",
+            ) from exc
 
     @property
     def formats(self) -> tuple[str, ...]:
