@@ -91,3 +91,14 @@ pip install -e .
 pip install ./plugins/<你的包>
 python -c "from openconvert.registry import default_registry; print(default_registry().formats)"
 ```
+
+## 七、运行期失败的处理
+
+- 插件在 `export()` 里抛 `ExporterError`：核心原样转发 `code` 与 `message`，CLI 显示一行
+  `错误：导出失败：<message>`，退出码 3。
+- 插件抛其他异常（`RuntimeError`、`TypeError`、`KeyError` 等，即违反第二节第 4 条）：
+  核心不让 traceback 漏给用户，统一包成
+  `ExporterError("PLUGIN_FAILED", "插件 '<格式名>' 执行失败：<原始消息>")`，
+  用户看到的仍是一行提示、退出码 3，临时文件被清理、目标文件保持原样。
+  这层兜底只保证“不吓到用户”，插件仍应自己抛 `ExporterError` 并给出准确原因。
+- `KeyboardInterrupt`、`SystemExit` 属中断信号，核心不吞，照常向上抛。

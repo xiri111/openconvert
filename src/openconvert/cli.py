@@ -6,7 +6,8 @@
 ====  ================================================
 0     成功
 2     参数或前置条件不满足（文件不存在、格式不存在、目标已存在）
-3     读取失败或导出失败（CSV 解码错误、导出器抛 ExporterError）
+3     读取失败或导出失败（CSV 解码错误、导出器抛 ExporterError；
+      插件抛其他异常时由 registry.export 归一成 ExporterError）
 4     写盘失败（临时文件写入或改名失败）
 ====  ================================================
 """
@@ -108,8 +109,9 @@ def _convert(args: argparse.Namespace) -> int:
     if not source.is_file():
         return _fail(EXIT_USAGE, f"输入文件不存在：{source}")
 
+    registry = default_registry()
     try:
-        exporter = default_registry().get(args.format)
+        registry.get(args.format)
     except UnknownFormatError as exc:
         return _fail(EXIT_USAGE, str(exc))
 
@@ -133,7 +135,7 @@ def _convert(args: argparse.Namespace) -> int:
     try:
         size = write_atomic(
             target,
-            lambda stream: exporter.export(table, stream),
+            lambda stream: registry.export(args.format, table, stream),
             overwrite=args.overwrite,
         )
     except TargetExistsError as exc:
